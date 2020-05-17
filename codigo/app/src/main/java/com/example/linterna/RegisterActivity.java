@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.linterna.clients.LoginClient;
 import com.example.linterna.clients.RegisterClient;
-import com.example.linterna.clients.interfaces.Register;
 import com.example.linterna.entities.UserResponse;
 
 import org.apache.commons.lang3.StringUtils;
