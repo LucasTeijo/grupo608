@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Linterna</string>
+    <string name="login_button">Ingresar</string>
+    <string name="register_button">Registrarse</string>
 </resources>
