@@ -1,7 +1,6 @@
 package com.example.linterna;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -12,7 +11,7 @@ import com.example.linterna.entities.UserResponse;
 import org.apache.commons.lang3.StringUtils;
 
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends LanternActivity {
 
     private TextView name;
     private TextView lastnameText;
@@ -40,11 +39,24 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     public void register(View view) {
+        clearErrorMessage(errorMessage);
+
+        if (!checkInternetConnection()) {
+            setErrorMessage(errorMessage, "No hay conexión a internet");
+            return;
+        }
+
+        String password = this.password.getText().toString();
+
+        if (StringUtils.isBlank(password) || password.length() < 8) {
+            setErrorMessage(errorMessage, "La contraseña tiene que tener al menos 8 caracteres");
+            return;
+        }
+
         String name = this.name.getText().toString();
         String lastNameText = this.lastnameText.getText().toString();
         String emailText = this.emailText.getText().toString();
         String dniText = this.dniText.getText().toString();
-        String password = this.password.getText().toString();
 
         Integer dni = StringUtils.isNotEmpty(dniText) ? Integer.valueOf(dniText) : null;
 
@@ -65,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void refuseAccess() {
         System.out.println("------------------");
-        errorMessage.setText("Hubo un error vuelve a intentar");
+        setErrorMessage(errorMessage, "Hubo un error vuelve a intentar");
         System.out.println("------------------");
     }
 }

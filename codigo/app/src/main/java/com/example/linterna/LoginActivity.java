@@ -1,7 +1,5 @@
 package com.example.linterna;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -9,9 +7,7 @@ import android.widget.TextView;
 import com.example.linterna.clients.LoginClient;
 import com.example.linterna.entities.UserResponse;
 
-import org.apache.commons.lang3.StringUtils;
-
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends LanternActivity {
 
     private TextView emailText;
     private TextView password;
@@ -32,6 +28,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
+        clearErrorMessage(errorMessage);
+
+        if (!checkInternetConnection()) {
+            setErrorMessage(errorMessage, "No hay conexión a internet");
+            return;
+        }
+
         String emailText = this.emailText.getText().toString();
         String password = this.password.getText().toString();
 
@@ -40,13 +43,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void manageAccess(UserResponse response) {
         System.out.println("------------------");
-        errorMessage.setText(StringUtils.EMPTY);
+        clearErrorMessage(errorMessage);
         System.out.println("------------------");
     }
 
     private void refuseAccess() {
         System.out.println("------------------");
-        errorMessage.setText("Hubo un error vuelve a intentar");
+        setErrorMessage(errorMessage, "Hubo un error vuelve a intentar");
         System.out.println("------------------");
     }
 }
