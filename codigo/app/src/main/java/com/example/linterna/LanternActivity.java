@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class LanternActivity extends AppCompatActivity {
 
+    public static final String TOKEN_KEY = "token";
+
     protected boolean checkInternetConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         return isConnected(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)) ||

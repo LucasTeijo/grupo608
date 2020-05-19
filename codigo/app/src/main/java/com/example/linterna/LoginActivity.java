@@ -45,8 +45,7 @@ public class LoginActivity extends LanternActivity {
     private void manageAccess(UserResponse response) {
         Intent intent = new Intent(this, SensorActivity.class);
 
-        Bundle extras = intent.getExtras();
-        extras.putString("token", response.getToken());
+        intent.putExtra(TOKEN_KEY, response.getToken());
 
         startActivity(intent);
     }

@@ -1,13 +1,16 @@
 package com.example.linterna;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class SensorActivity extends AppCompatActivity {
+public class SensorActivity extends LanternActivity {
+
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
+
+        this.token = (String) this.getIntent().getExtras().get(TOKEN_KEY);
     }
 }
