@@ -31,7 +31,7 @@ public class SendEventClient extends RetrofitClient<SendEvent> {
         return "http://so-unlam.net.ar/";
     }
 
-    public void login(String token, Event event) {
+    public void sendEvent(String token, Event event) {
         Call<EventResponse> call = getClient().sendEvent(token, event);
 
         call.enqueue(new Callback<EventResponse>() {
