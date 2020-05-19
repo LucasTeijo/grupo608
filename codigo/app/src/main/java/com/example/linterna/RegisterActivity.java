@@ -64,20 +64,15 @@ public class RegisterActivity extends LanternActivity {
     }
 
     private void manageAccess(UserResponse response) {
-        System.out.println("------------------");
-
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, SensorActivity.class);
 
         Bundle extras = intent.getExtras();
         extras.putString("token", response.getToken());
 
         startActivity(intent);
-        System.out.println("------------------");
     }
 
     private void refuseAccess() {
-        System.out.println("------------------");
         setErrorMessage(errorMessage, "Hubo un error vuelve a intentar");
-        System.out.println("------------------");
     }
 }

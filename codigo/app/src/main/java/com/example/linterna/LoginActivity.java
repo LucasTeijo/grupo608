@@ -1,5 +1,6 @@
 package com.example.linterna;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -42,9 +43,12 @@ public class LoginActivity extends LanternActivity {
     }
 
     private void manageAccess(UserResponse response) {
-        System.out.println("------------------");
-        clearErrorMessage(errorMessage);
-        System.out.println("------------------");
+        Intent intent = new Intent(this, SensorActivity.class);
+
+        Bundle extras = intent.getExtras();
+        extras.putString("token", response.getToken());
+
+        startActivity(intent);
     }
 
     private void refuseAccess() {
