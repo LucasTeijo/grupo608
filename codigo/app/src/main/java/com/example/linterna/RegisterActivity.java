@@ -1,5 +1,6 @@
 package com.example.linterna;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -40,19 +41,25 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void register(View view) {
         String name = this.name.getText().toString();
-        String lastNametText = this.lastnameText.getText().toString();
+        String lastNameText = this.lastnameText.getText().toString();
         String emailText = this.emailText.getText().toString();
         String dniText = this.dniText.getText().toString();
         String password = this.password.getText().toString();
 
         Integer dni = StringUtils.isNotEmpty(dniText) ? Integer.valueOf(dniText) : null;
 
-        registerClient.register(name, lastNametText, emailText, dni, password);
+        registerClient.register(name, lastNameText, emailText, dni, password);
     }
 
     private void manageAccess(UserResponse response) {
         System.out.println("------------------");
-        errorMessage.setText(StringUtils.EMPTY);
+
+        Intent intent = new Intent(this, LoginActivity.class);
+
+        Bundle extras = intent.getExtras();
+        extras.putString("token", response.getToken());
+
+        startActivity(intent);
         System.out.println("------------------");
     }
 

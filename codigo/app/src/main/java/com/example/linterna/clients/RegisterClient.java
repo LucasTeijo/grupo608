@@ -10,7 +10,6 @@ import com.example.linterna.entities.User;
 import com.example.linterna.entities.UserResponse;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,7 +32,7 @@ public class RegisterClient extends RetrofitClient<Register> {
     }
 
     public void register(String name, String lastname, String email, Integer dni, String password) {
-        Call<UserResponse> call = getClient().call(new User()
+        Call<UserResponse> call = getClient().register(new User()
                 .setEnv(Env.TEST)
                 .setName(name)
                 .setLastname(lastname)

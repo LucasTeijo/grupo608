@@ -4,9 +4,9 @@ package com.example.linterna.clients;
 import android.annotation.SuppressLint;
 
 import com.example.linterna.Run;
-import com.example.linterna.clients.interfaces.Login;
-import com.example.linterna.entities.Env;
-import com.example.linterna.entities.User;
+import com.example.linterna.clients.interfaces.SendEvent;
+import com.example.linterna.entities.Event;
+import com.example.linterna.entities.EventResponse;
 import com.example.linterna.entities.UserResponse;
 
 import java.util.function.Consumer;
@@ -15,13 +15,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginClient extends RetrofitClient<Login> {
+public class SendEventClient extends RetrofitClient<SendEvent> {
 
-    private Consumer<UserResponse> onSuccess;
+    private Consumer<EventResponse> onSuccess;
     private Run onFailure;
 
-    public LoginClient(Consumer<UserResponse> onSuccess, Run onFailure) {
-        super(Login.class);
+    public SendEventClient(Consumer<EventResponse> onSuccess, Run onFailure) {
+        super(SendEvent.class);
         this.onSuccess = onSuccess;
         this.onFailure = onFailure;
     }
@@ -31,18 +31,13 @@ public class LoginClient extends RetrofitClient<Login> {
         return "http://so-unlam.net.ar/";
     }
 
-    public void login(String email, String password) {
-        Call<UserResponse> call = getClient().login(new User()
-                .setEnv(Env.TEST)
-                .setEmail(email)
-                .setCommission(2900)
-                .setGroup(608)
-                .setPassword(password));
+    public void login(String token, Event event) {
+        Call<EventResponse> call = getClient().sendEvent(token, event);
 
-        call.enqueue(new Callback<UserResponse>() {
+        call.enqueue(new Callback<EventResponse>() {
             @SuppressLint("NewApi")
             @Override
-            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+            public void onResponse(Call<EventResponse> call, Response<EventResponse> response) {
 
                 if (response.isSuccessful() && !"error".equals(response.body().getState())) {
                     onSuccess.accept(response.body());
@@ -53,7 +48,7 @@ public class LoginClient extends RetrofitClient<Login> {
             }
 
             @Override
-            public void onFailure(Call<UserResponse> call, Throwable t) {
+            public void onFailure(Call<EventResponse> call, Throwable t) {
                 onFailure.run();
             }
         });
