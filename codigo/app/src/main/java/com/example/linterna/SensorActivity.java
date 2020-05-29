@@ -27,6 +27,10 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
     SharedPreferences.Editor editor;
     String txtLuz;
     String txtAce;
+    Float valorLuz;
+    Float valorAceX;
+    Float valorAceY;
+    Float valorAceZ;
 
 
     @Override
@@ -42,24 +46,34 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
-        txtLuz += "Luminosidad\n";
-        luz.setText(txtLuz);
 
-        new Handler().postDelayed(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
+                txtLuz ="";
+                txtLuz += "Luminosidad\n";
+                txtLuz += valorLuz + " Lux \n";
                 luz.setText(txtLuz);
+                editor.putFloat("Luminosidad",valorLuz).apply();
                 new Handler().postDelayed(this, 3000);
             }
-        }, 3);
+        });
 
-        new Handler().postDelayed(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
+                txtAce = "";
+                txtAce += "Acelerometro:\n";
+                txtAce += "x: " + dosdecimales.format(valorAceX) + " m/seg2 \n";
+                txtAce += "y: " + dosdecimales.format(valorAceY) + " m/seg2 \n";
+                txtAce += "z: " + dosdecimales.format(valorAceZ) + " m/seg2 \n";
                 acelerometro.setText(txtAce);
+                editor.putFloat("Aceleracion X", valorAceX).apply();
+                editor.putFloat("Aceleracion Y", valorAceY).apply();
+                editor.putFloat("Aceleracion Z", valorAceZ).apply();
                 new Handler().postDelayed(this, 3000);
             }
-        }, 3);
+        });
     }
 
     protected void Ini_Sensores(){
@@ -79,17 +93,15 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
             switch(event.sensor.getType())
             {
                 case Sensor.TYPE_LIGHT :
-                    txtLuz ="";
-                    txtLuz += "Luminosidad\n";
-                    txtLuz += event.values[0] + " Lux \n";
+                    valorLuz = event.values[0];
+
                     break;
 
                 case Sensor.TYPE_ACCELEROMETER :
-                    txtAce = "";
-                    txtAce += "Acelerometro:\n";
-                    txtAce += "x: " + dosdecimales.format(event.values[0]) + " m/seg2 \n";
-                    txtAce += "y: " + dosdecimales.format(event.values[1]) + " m/seg2 \n";
-                    txtAce += "z: " + dosdecimales.format(event.values[2]) + " m/seg2 \n";
+                    valorAceX =  event.values[0];
+                    valorAceY =  event.values[1];
+                    valorAceZ =  event.values[2];
+
                     break;
             }
         }
