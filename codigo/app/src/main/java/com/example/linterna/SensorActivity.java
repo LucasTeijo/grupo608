@@ -15,15 +15,16 @@ import java.text.DecimalFormat;
 
 public class SensorActivity extends LanternActivity implements SensorEventListener {
 
+    public static final int REFRESH_DELAY = 500;
+    public static final String MY_PREFERENCES = "MyPrefs";
+    private DecimalFormat TWO_DECIMALS_FORMATTER = new DecimalFormat("###.##");
+
     private String token;
     private SensorManager mSensorManager;
     private TextView lightText;
     private TextView accelerometerText;
 
-    private DecimalFormat twoDecimalsFormatter = new DecimalFormat("###.##");
-
     private SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs";
     private SharedPreferences.Editor editor;
     private Float lightValue;
     private Float accelerometerX;
@@ -41,7 +42,7 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
         lightText = findViewById(R.id.luz);
         accelerometerText = findViewById(R.id.acelerometro);
 
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences(MY_PREFERENCES, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
 
@@ -49,19 +50,19 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
             String txt = "Luminosidad\n" + lightValue + " Lux \n";
             lightText.setText(txt);
             editor.putFloat("luminosity", lightValue).apply();
-        }, 3000);
+        }, REFRESH_DELAY);
 
         new Handler().postDelayed(() -> {
             String txt = "Acelerometro:\n";
-            txt += "x: " + (accelerometerX != null ? twoDecimalsFormatter.format(accelerometerX) : 0) + " m/seg2 \n";
-            txt += "y: " + (accelerometerY != null ? twoDecimalsFormatter.format(accelerometerY) : 0) + " m/seg2 \n";
-            txt += "z: " + (accelerometerZ != null ? twoDecimalsFormatter.format(accelerometerZ) : 0) + " m/seg2 \n";
+            txt += "x: " + (accelerometerX != null ? TWO_DECIMALS_FORMATTER.format(accelerometerX) : 0) + " m/seg2 \n";
+            txt += "y: " + (accelerometerY != null ? TWO_DECIMALS_FORMATTER.format(accelerometerY) : 0) + " m/seg2 \n";
+            txt += "z: " + (accelerometerZ != null ? TWO_DECIMALS_FORMATTER.format(accelerometerZ) : 0) + " m/seg2 \n";
             accelerometerText.setText(txt);
             editor.putFloat("acceleration_X", accelerometerX);
             editor.putFloat("acceleration_Y", accelerometerY);
             editor.putFloat("acceleration_Z", accelerometerZ);
             editor.apply();
-        }, 3000);
+        }, REFRESH_DELAY);
     }
 
     protected void initializeSensors() {
