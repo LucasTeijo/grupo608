@@ -2,7 +2,7 @@ package com.example.linterna.entities;
 
 public class Event {
     private Env env;
-    private String typeEvents;
+    private TypeEvent typeEvents;
     private String state;
     private String description;
     private Integer group;
@@ -11,7 +11,7 @@ public class Event {
         return env;
     }
 
-    public String getTypeEvents() {
+    public TypeEvent getTypeEvents() {
         return typeEvents;
     }
 
