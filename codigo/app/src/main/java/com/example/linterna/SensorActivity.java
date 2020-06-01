@@ -17,20 +17,18 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
 
     private String token;
     private SensorManager mSensorManager;
-    private TextView luz;
-    private TextView acelerometro;
+    private TextView lightText;
+    private TextView accelerometerText;
 
-    DecimalFormat dosdecimales = new DecimalFormat("###.###");
+    private DecimalFormat twoDecimalsFormatter = new DecimalFormat("###.##");
 
-    SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
-    SharedPreferences.Editor editor;
-    String txtLuz;
-    String txtAce;
-    Float valorLuz;
-    Float valorAceX;
-    Float valorAceY;
-    Float valorAceZ;
+    private SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs";
+    private SharedPreferences.Editor editor;
+    private Float lightValue;
+    private Float accelerometerX;
+    private Float accelerometerY;
+    private Float accelerometerZ;
 
 
     @Override
@@ -40,94 +38,77 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         this.token = (String) this.getIntent().getExtras().get(TOKEN_KEY);
 
-        luz = findViewById(R.id.luz);
-        acelerometro = findViewById(R.id.acelerometro);
+        lightText = findViewById(R.id.luz);
+        accelerometerText = findViewById(R.id.acelerometro);
 
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
 
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                txtLuz ="";
-                txtLuz += "Luminosidad\n";
-                txtLuz += valorLuz + " Lux \n";
-                luz.setText(txtLuz);
-                editor.putFloat("Luminosidad",valorLuz).apply();
-                new Handler().postDelayed(this, 3000);
-            }
-        });
+        new Handler().postDelayed(() -> {
+            String txt = "Luminosidad\n" + lightValue + " Lux \n";
+            lightText.setText(txt);
+            editor.putFloat("luminosity", lightValue).apply();
+        }, 3000);
 
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                txtAce = "";
-                txtAce += "Acelerometro:\n";
-                txtAce += "x: " + dosdecimales.format(valorAceX) + " m/seg2 \n";
-                txtAce += "y: " + dosdecimales.format(valorAceY) + " m/seg2 \n";
-                txtAce += "z: " + dosdecimales.format(valorAceZ) + " m/seg2 \n";
-                acelerometro.setText(txtAce);
-                editor.putFloat("Aceleracion X", valorAceX).apply();
-                editor.putFloat("Aceleracion Y", valorAceY).apply();
-                editor.putFloat("Aceleracion Z", valorAceZ).apply();
-                new Handler().postDelayed(this, 3000);
-            }
-        });
+        new Handler().postDelayed(() -> {
+            String txt = "Acelerometro:\n";
+            txt += "x: " + (accelerometerX != null ? twoDecimalsFormatter.format(accelerometerX) : 0) + " m/seg2 \n";
+            txt += "y: " + (accelerometerY != null ? twoDecimalsFormatter.format(accelerometerY) : 0) + " m/seg2 \n";
+            txt += "z: " + (accelerometerZ != null ? twoDecimalsFormatter.format(accelerometerZ) : 0) + " m/seg2 \n";
+            accelerometerText.setText(txt);
+            editor.putFloat("acceleration_X", accelerometerX);
+            editor.putFloat("acceleration_Y", accelerometerY);
+            editor.putFloat("acceleration_Z", accelerometerZ);
+            editor.apply();
+        }, 3000);
     }
 
-    protected void Ini_Sensores(){
+    protected void initializeSensors() {
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     }
-    protected void Parar_Sensores(){
+
+    protected void stopSensors() {
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public synchronized void onSensorChanged(SensorEvent event) {
+        Log.d("sensor", event.sensor.getName());
 
-        synchronized (this){
-            Log.d("sensor", event.sensor.getName());
-            switch(event.sensor.getType())
-            {
-                case Sensor.TYPE_LIGHT :
-                    valorLuz = event.values[0];
-
-                    break;
-
-                case Sensor.TYPE_ACCELEROMETER :
-                    valorAceX =  event.values[0];
-                    valorAceY =  event.values[1];
-                    valorAceZ =  event.values[2];
-
-                    break;
-            }
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_LIGHT:
+                lightValue = event.values[0];
+                break;
+            case Sensor.TYPE_ACCELEROMETER:
+                accelerometerX = event.values[0];
+                accelerometerY = event.values[1];
+                accelerometerZ = event.values[2];
+                break;
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
+    public void onAccuracyChanged(Sensor sensor, int i) {}
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
-        Ini_Sensores();
+        initializeSensors();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
-        Parar_Sensores();
+        stopSensors();
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
-        Parar_Sensores();
+        stopSensors();
     }
 
 
