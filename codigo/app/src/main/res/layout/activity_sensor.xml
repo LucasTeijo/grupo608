@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".SensorActivity">
 
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/lantern"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
     <TextView
         android:id="@+id/luz"
         android:layout_width="352dp"
@@ -16,8 +25,6 @@
         android:layout_marginEnd="33dp"
         android:layout_marginRight="33dp"
         android:layout_marginBottom="127dp"
-        android:autoText="false"
-        android:text="TextView"
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/acelerometro"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +41,6 @@
         android:layout_marginEnd="35dp"
         android:layout_marginRight="35dp"
         android:layout_marginBottom="231dp"
-        android:text="TextView"
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -46,23 +46,31 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
         editor = sharedpreferences.edit();
 
 
-        new Handler().postDelayed(() -> {
-            String txt = "Luminosidad\n" + lightValue + " Lux \n";
-            lightText.setText(txt);
-            editor.putFloat("luminosity", lightValue).apply();
-        }, REFRESH_DELAY);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                String txt = "Luminosidad\n" + lightValue + " Lux \n";
+                lightText.setText(txt);
+                editor.putFloat("luminosity", lightValue).apply();
+                new Handler().postDelayed(this, REFRESH_DELAY);
+            }
+        });
 
-        new Handler().postDelayed(() -> {
-            String txt = "Acelerometro:\n";
-            txt += "x: " + (accelerometerX != null ? TWO_DECIMALS_FORMATTER.format(accelerometerX) : 0) + " m/seg2 \n";
-            txt += "y: " + (accelerometerY != null ? TWO_DECIMALS_FORMATTER.format(accelerometerY) : 0) + " m/seg2 \n";
-            txt += "z: " + (accelerometerZ != null ? TWO_DECIMALS_FORMATTER.format(accelerometerZ) : 0) + " m/seg2 \n";
-            accelerometerText.setText(txt);
-            editor.putFloat("acceleration_X", accelerometerX);
-            editor.putFloat("acceleration_Y", accelerometerY);
-            editor.putFloat("acceleration_Z", accelerometerZ);
-            editor.apply();
-        }, REFRESH_DELAY);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                String txt = "Acelerometro:\n";
+                txt += "x: " + (accelerometerX != null ? TWO_DECIMALS_FORMATTER.format(accelerometerX) : 0) + " m/seg2 \n";
+                txt += "y: " + (accelerometerY != null ? TWO_DECIMALS_FORMATTER.format(accelerometerY) : 0) + " m/seg2 \n";
+                txt += "z: " + (accelerometerZ != null ? TWO_DECIMALS_FORMATTER.format(accelerometerZ) : 0) + " m/seg2 \n";
+                accelerometerText.setText(txt);
+                editor.putFloat("acceleration_X", accelerometerX);
+                editor.putFloat("acceleration_Y", accelerometerY);
+                editor.putFloat("acceleration_Z", accelerometerZ);
+                editor.apply();
+                new Handler().postDelayed(this, REFRESH_DELAY);
+            }
+        });
     }
 
     protected void initializeSensors() {
@@ -92,7 +100,8 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {}
+    public void onAccuracyChanged(Sensor sensor, int i) {
+    }
 
     @Override
     protected void onResume() {
