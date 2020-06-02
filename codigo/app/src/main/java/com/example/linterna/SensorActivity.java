@@ -1,30 +1,34 @@
 package com.example.linterna;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.linterna.clients.SendEventClient;
 import com.example.linterna.entities.Event;
 import com.example.linterna.entities.EventResponse;
+import com.example.linterna.entities.TypeEvent;
+import com.example.linterna.utils.JsonUtils;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
-import static com.example.linterna.HistoricActivity.HISTORY_KEY;
 import static com.example.linterna.HistoricActivity.SENSORS_DATA_KEY;
 
 public class SensorActivity extends LanternActivity implements SensorEventListener {
 
-    public static final int REFRESH_DELAY = 500;
-    public static final String MY_PREFERENCES = "MyPrefs";
+    public static final int REFRESH_DELAY = 3000;
     private DecimalFormat TWO_DECIMALS_FORMATTER = new DecimalFormat("###.##");
 
     private String token;
@@ -32,8 +36,7 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
     private TextView lightText;
     private TextView accelerometerText;
 
-    private SharedPreferences sharedpreferences;
-    private SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
     private Float lightValue;
     private Float accelerometerX;
     private Float accelerometerY;
@@ -51,8 +54,7 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
         lightText = findViewById(R.id.luz);
         accelerometerText = findViewById(R.id.acelerometro);
 
-        sharedpreferences = getSharedPreferences(MY_PREFERENCES, Context.MODE_PRIVATE);
-        editor = sharedpreferences.edit();
+        sharedPreferences = getSharedPreferences(SENSORS_DATA_KEY, Context.MODE_PRIVATE);
 
         sendEventClient = new SendEventClient(this::onSuccessSendEvent, this::onFailureSendEvent);
 
@@ -60,9 +62,14 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                String txt = "Luminosidad\n" + lightValue + " Lux \n";
+                String txt = "Luminosidad\n" + lightValue + " Lux";
+                Event event = new Event()
+                        .setTypeEvents(TypeEvent.LIGHT_SENSOR)
+                        .setState("ACTIVE")
+                        .setDescription(txt);
+
+                sendEvent(event);
                 lightText.setText(txt);
-                editor.putFloat("luminosity", lightValue).apply();
                 new Handler().postDelayed(this, REFRESH_DELAY);
             }
         });
@@ -71,14 +78,17 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
             @Override
             public void run() {
                 String txt = "Acelerometro:\n";
-                txt += "x: " + (accelerometerX != null ? TWO_DECIMALS_FORMATTER.format(accelerometerX) : 0) + " m/seg2 \n";
-                txt += "y: " + (accelerometerY != null ? TWO_DECIMALS_FORMATTER.format(accelerometerY) : 0) + " m/seg2 \n";
-                txt += "z: " + (accelerometerZ != null ? TWO_DECIMALS_FORMATTER.format(accelerometerZ) : 0) + " m/seg2 \n";
+                txt += "\t x: " + (accelerometerX != null ? TWO_DECIMALS_FORMATTER.format(accelerometerX) : 0) + " m/seg2 \n";
+                txt += "\t y: " + (accelerometerY != null ? TWO_DECIMALS_FORMATTER.format(accelerometerY) : 0) + " m/seg2 \n";
+                txt += "\t z: " + (accelerometerZ != null ? TWO_DECIMALS_FORMATTER.format(accelerometerZ) : 0) + " m/seg2";
                 accelerometerText.setText(txt);
-                editor.putFloat("acceleration_X", accelerometerX);
-                editor.putFloat("acceleration_Y", accelerometerY);
-                editor.putFloat("acceleration_Z", accelerometerZ);
-                editor.apply();
+
+                Event event = new Event()
+                        .setTypeEvents(TypeEvent.ACCELEROMETER_SENSOR)
+                        .setState("ACTIVE")
+                        .setDescription(txt);
+                sendEvent(event);
+
                 new Handler().postDelayed(this, REFRESH_DELAY);
             }
         });
@@ -115,31 +125,28 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
     }
 
 
-    protected void sendEvent() {
-        sendEventClient.sendEvent(token, new Event());
+    protected void sendEvent(Event event) {
+        sendEventClient.sendEvent(token, event);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     protected void onSuccessSendEvent(EventResponse response) {
-        List<Event> events = getEventsHistory();
-
-        events.add(response.getEvent());
-
-        setEventsHistory(events);
-    }
-
-    private List<Event> getEventsHistory() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SENSORS_DATA_KEY, Context.MODE_PRIVATE);
-
-        String history = sharedPreferences.getString(HISTORY_KEY, "[]");
-
-        return JsonUtil.fromJsonList(history, Event.class);
+        setEventToHistory(response.getEvent());
     }
 
 
-    private void setEventsHistory(List<Event> events) {
-        SharedPreferences.Editor edit = getSharedPreferences(SENSORS_DATA_KEY, Context.MODE_PRIVATE).edit();
-        edit.putString(HISTORY_KEY, JsonUtil.toJson(events));
-        edit.apply();
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private synchronized void setEventToHistory(Event newEvent) {
+        List<Event> eventsHistory = getEventsHistory(sharedPreferences, newEvent.getTypeEvents());
+
+        if (eventsHistory.size() == 5) {
+            eventsHistory.remove(4);
+        }
+
+        eventsHistory.add(newEvent);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getKey(newEvent.getTypeEvents()), JsonUtils.toJson(eventsHistory));
+        editor.apply();
     }
 
     protected void onFailureSendEvent() {
@@ -163,6 +170,13 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
     protected void onDestroy() {
         super.onDestroy();
         stopSensors();
+    }
+
+    /**
+     * This is called when the login button is pressed
+     */
+    public void goToHistoricView(View view) {
+        startActivity(new Intent(this, HistoricActivity.class));
     }
 
 

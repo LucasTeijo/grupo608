@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 
 public interface SendEvent {
 
-    @POST("api/api/sendEvent")
+    @POST("api/api/event")
     Call<EventResponse> sendEvent(@Header("token") String token, @Body Event event);
 
 }
