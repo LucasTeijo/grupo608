@@ -143,7 +143,7 @@ public class SensorActivity extends LanternActivity implements SensorEventListen
             eventsHistory.remove(4);
         }
 
-        eventsHistory.add(newEvent);
+        eventsHistory.add(0, newEvent);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getKey(newEvent.getTypeEvents()), JsonUtils.toJson(eventsHistory));
         editor.apply();
