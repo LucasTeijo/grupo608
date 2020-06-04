@@ -33,7 +33,7 @@ public class RegisterClient extends RetrofitClient<Register> {
 
     public void register(String name, String lastname, String email, Integer dni, String password) {
         Call<UserResponse> call = getClient().register(new User()
-                .setEnv(Env.TEST)
+                .setEnv(Env.DEV)
                 .setName(name)
                 .setLastname(lastname)
                 .setEmail(email)

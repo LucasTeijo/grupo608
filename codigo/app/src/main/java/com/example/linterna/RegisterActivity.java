@@ -6,6 +6,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.linterna.clients.RegisterClient;
+import com.example.linterna.clients.SendEventClient;
+import com.example.linterna.entities.Event;
+import com.example.linterna.entities.TypeEvent;
 import com.example.linterna.entities.UserResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +24,7 @@ public class RegisterActivity extends LanternActivity {
     private TextView errorMessage;
 
     private RegisterClient registerClient;
+    private SendEventClient sendEventClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,7 @@ public class RegisterActivity extends LanternActivity {
         this.errorMessage = findViewById(R.id.error_message);
 
         this.registerClient = new RegisterClient(this::manageAccess, this::refuseAccess);
+        this.sendEventClient = new SendEventClient(r -> System.out.print("Event sent"), () -> System.out.print("Fail sending event"));
     }
 
 
@@ -66,7 +71,13 @@ public class RegisterActivity extends LanternActivity {
     private void manageAccess(UserResponse response) {
         Intent intent = new Intent(this, SensorActivity.class);
 
-        intent.putExtra(TOKEN_KEY, response.getToken());
+        String token = response.getToken();
+        sendEventClient.sendEvent(token, new Event()
+                .setTypeEvents(TypeEvent.REGISTER)
+                .setState("ACTIVE")
+                .setDescription("User registered successfully"));
+
+        intent.putExtra(TOKEN_KEY, token);
 
         startActivity(intent);
     }

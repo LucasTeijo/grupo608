@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Event {
-    private Env env = Env.TEST;
+    private Env env = Env.DEV;
     private TypeEvent typeEvents;
     private String state;
     private String description;
